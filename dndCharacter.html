@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Character</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d0906 0%, #1a1410 50%, #0d0906 100%);
+            font-family: 'MedievalSharp', cursive;
+            color: #c9b896;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at top, rgba(139, 90, 43, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(50, 30, 15, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: linear-gradient(135deg, #1a1410 0%, #2b1f17 50%, #1a1410 100%);
+            border: 3px solid #8b5a2b;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 
+                0 0 40px rgba(139, 90, 43, 0.4),
+                inset 0 0 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+            transition: filter 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 95%;
+            }
+
+            h1 {
+                font-size: 1.8em !important;
+            }
+
+            .subtitle {
+                font-size: 0.9em !important;
+            }
+
+            .selection-grid,
+            .gender-selection {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+
+            .tekken-class-grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+
+            .class-portrait {
+                height: 200px !important;
+            }
+
+            label {
+                font-size: 1em !important;
+            }
+
+            input[type="text"] {
+                font-size: 1em !important;
+                padding: 10px !important;
+            }
+
+            .create-btn {
+                font-size: 1.2em !important;
+                padding: 12px !important;
+            }
+
+            .overview-card {
+                padding: 15px !important;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .gender-card,
+            .selection-card,
+            .tekken-class-card {
+                min-height: 50px;
+                touch-action: manipulation;
+            }
+
+            .overview-item {
+                font-size: 0.95em !important;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                max-width: 90%;
+                padding: 30px;
+            }
+
+            .tekken-class-grid {
+                gap: 15px;
+            }
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #8b5a2b, #cd853f, #8b5a2b, #5c3a1e);
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .container.blur {
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+        h1 {
+            text-align: center;
+            color: #cd853f;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 
+                0 0 10px rgba(205, 133, 63, 0.5),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+            background: linear-gradient(180deg, #cd853f 0%, #8b5a2b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #a0826d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #cd853f;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            text-shadow: 
+                0 0 8px rgba(205, 133, 63, 0.4),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #0d0906 0%, #1a1410 100%);
+            border: 2px solid #5c3a1e;
+            border-radius: 8px;
+            color: #c9b896;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #8b5a2b;
+            box-shadow: 
+                0 0 15px rgba(139, 90, 43, 0.5),
+                inset 0 2px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Gender Selection */
+        .gender-selection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .gender-card {
+            background: linear-gradient(135deg, #0d0906 0%, #1a1410 100%);
+            border: 3px solid #5c3a1e;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.8),
+                0 3px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .gender-card:hover {
+            border-color: #8b5a2b;
+            transform: scale(1.05);
+            box-shadow: 
+                0 5px 20px rgba(139, 90, 43, 0.5),
+                inset 0 2px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .gender-card.selected {
+            border-color: #cd853f;
+            background: linear-gradient(135deg, #2b1f17 0%, #3d2a1f 50%, #2b1f17 100%);
+            box-shadow: 
+                0 0 25px rgba(205, 133, 63, 0.8),
+                inset 0 0 20px rgba(205, 133, 63, 0.15);
+        }
+
+        .gender-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 10px rgba(139, 90, 43, 0.6));
+        }
+
+        .gender-card h3 {
+            color: #cd853f;
+            font-size: 1.4em;
+            text-shadow: 
+                0 0 8px rgba(205, 133, 63, 0.4),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Race Selection - Compact */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .selection-card {
+            background: linear-gradient(135deg, #0d0906 0%, #1a1410 100%);
+            border: 2px solid #5c3a1e;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 
+                inset 0 1px 3px rgba(0, 0, 0, 0.8),
+                0 2px 8px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .selection-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 90, 43, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .selection-card:hover::before {
+            left: 100%;
+        }
+
+        .selection-card:hover {
+            border-color: #8b5a2b;
+            transform: translateY(-3px);
+            box-shadow: 
+                0 5px 20px rgba(139, 90, 43, 0.4),
+                inset 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .selection-card.selected {
+            border-color: #8b5a2b;
+            background: linear-gradient(135deg, #2b1f17 0%, #3d2a1f 50%, #2b1f17 100%);
+            box-shadow: 
+                0 0 20px rgba(139, 90, 43, 0.6),
+                inset 0 0 20px rgba(205, 133, 63, 0.1);
+        }
+
+        .selection-card h3 {
+            color: #cd853f;
+            font-size: 1.1em;
+            margin-bottom: 3px;
+            text-shadow: 
+                0 0 8px rgba(205, 133, 63, 0.4),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        .selection-card p {
+            color: #a0826d;
+            font-size: 0.85em;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Tekken-Style Class Selection */
+        .tekken-class-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .tekken-class-card {
+            cursor: pointer;
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .tekken-class-card:hover {
+            transform: scale(1.05);
+        }
+
+        .class-portrait {
+            position: relative;
+            height: 250px;
+            border: 4px solid #5c3a1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 
+                0 5px 20px rgba(0, 0, 0, 0.8),
+                inset 0 -60px 80px rgba(0, 0, 0, 0.9);
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .warrior-bg {
+            background: radial-gradient(ellipse at center, rgba(139, 37, 0, 0.4) 0%, #0d0906 70%);
+        }
+
+        .rogue-bg {
+            background: radial-gradient(ellipse at center, rgba(75, 0, 130, 0.4) 0%, #0d0906 70%);
+        }
+
+        .mage-bg {
+            background: radial-gradient(ellipse at center, rgba(0, 100, 200, 0.4) 0%, #0d0906 70%);
+        }
+
+        .cleric-bg {
+            background: radial-gradient(ellipse at center, rgba(200, 200, 50, 0.4) 0%, #0d0906 70%);
+        }
+
+        .class-icon {
+            font-size: 80px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 20px rgba(139, 90, 43, 0.8));
+            opacity: 0.3;
+            transition: all 0.4s;
+        }
+
+        .class-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.95) 0%, transparent 100%);
+            transform: translateY(40px);
+            transition: all 0.4s;
+        }
+
+        .class-overlay h2 {
+            color: #cd853f;
+            font-size: 1.8em;
+            margin: 0 0 5px 0;
+            text-shadow: 
+                0 0 15px rgba(205, 133, 63, 0.8),
+                2px 2px 4px rgba(0, 0, 0, 1);
+            letter-spacing: 3px;
+        }
+
+        .class-subtitle {
+            color: #a0826d;
+            font-size: 0.9em;
+            margin: 0 0 10px 0;
+            font-style: italic;
+        }
+
+        .class-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 0.75em;
+            color: #8b5a2b;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .tekken-class-card:hover .class-portrait {
+            border-color: #8b5a2b;
+            box-shadow: 
+                0 0 40px rgba(139, 90, 43, 0.8),
+                inset 0 -60px 80px rgba(0, 0, 0, 0.9);
+        }
+
+        .tekken-class-card:hover .class-icon {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+            filter: drop-shadow(0 0 30px rgba(205, 133, 63, 1));
+        }
+
+        .tekken-class-card:hover .class-overlay {
+            transform: translateY(0);
+        }
+
+        .tekken-class-card:hover .class-stats {
+            opacity: 1;
+        }
+
+        .tekken-class-card.selected .class-portrait {
+            border: 4px solid #cd853f;
+            box-shadow: 
+                0 0 50px rgba(205, 133, 63, 1),
+                inset 0 0 30px rgba(205, 133, 63, 0.3);
+        }
+
+        .tekken-class-card.selected .class-icon {
+            opacity: 1;
+            animation: pulseClass 2s ease-in-out infinite;
+        }
+
+        .tekken-class-card.selected .class-overlay {
+            transform: translateY(0);
+            background: linear-gradient(0deg, rgba(139, 90, 43, 0.3) 0%, transparent 100%);
+        }
+
+        .tekken-class-card.selected .class-stats {
+            opacity: 1;
+        }
+
+        @keyframes pulseClass {
+            0%, 100% {
+                filter: drop-shadow(0 0 30px rgba(205, 133, 63, 1));
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            50% {
+                filter: drop-shadow(0 0 50px rgba(205, 133, 63, 1.5));
+                transform: translate(-50%, -50%) scale(1.3);
+            }
+        }
+
+        /* Character Overview Card */
+        .overview-card {
+            background: linear-gradient(135deg, #2b1f17 0%, #1a1410 50%, #2b1f17 100%);
+            border: 3px solid #8b5a2b;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0 20px 0;
+            box-shadow: 
+                0 0 30px rgba(139, 90, 43, 0.6),
+                inset 0 2px 15px rgba(0, 0, 0, 0.8);
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .overview-title {
+            text-align: center;
+            color: #cd853f;
+            font-size: 1.4em;
+            margin: 0 0 20px 0;
+            letter-spacing: 2px;
+            text-shadow: 
+                0 0 15px rgba(205, 133, 63, 0.6),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        .overview-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .overview-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, #0d0906 0%, #1a1410 100%);
+            border: 2px solid #5c3a1e;
+            border-radius: 8px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s;
+        }
+
+        .overview-row:hover {
+            border-color: #8b5a2b;
+            box-shadow: 
+                0 0 10px rgba(139, 90, 43, 0.4),
+                inset 0 2px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .overview-label {
+            color: #8b5a2b;
+            font-size: 1em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .overview-value {
+            color: #cd853f;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-shadow: 
+                0 0 10px rgba(205, 133, 63, 0.5),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .overview-ready {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(139, 90, 43, 0.2) 0%, rgba(205, 133, 63, 0.1) 100%);
+            border: 2px solid #8b5a2b;
+            border-radius: 10px;
+        }
+
+        .ready-icon {
+            font-size: 24px;
+            color: #cd853f;
+            filter: drop-shadow(0 0 10px rgba(205, 133, 63, 0.8));
+        }
+
+        .ready-text {
+            color: #cd853f;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-shadow: 
+                0 0 10px rgba(205, 133, 63, 0.5),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .create-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #5c3a1e 0%, #3d2412 100%);
+            border: 3px solid #8b5a2b;
+            border-radius: 10px;
+            color: #c9b896;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+            text-shadow: 
+                0 0 10px rgba(205, 133, 63, 0.3),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(205, 133, 63, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .create-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(205, 133, 63, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .create-btn:hover::before {
+            opacity: 1;
+        }
+
+        .create-btn:hover {
+            background: linear-gradient(135deg, #8b5a2b 0%, #5c3a1e 100%);
+            transform: scale(1.02);
+            box-shadow: 
+                0 5px 25px rgba(139, 90, 43, 0.6),
+                inset 0 1px 0 rgba(205, 133, 63, 0.3);
+            border-color: #cd853f;
+        }
+
+        .create-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(13, 9, 6, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 6px solid #2b1f17;
+            border-top: 6px solid #cd853f;
+            border-right: 6px solid #8b5a2b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+            box-shadow: 
+                0 0 20px rgba(139, 90, 43, 0.5),
+                inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #cd853f;
+            font-size: 1.5em;
+            text-shadow: 
+                0 0 15px rgba(205, 133, 63, 0.6),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .error-message {
+            color: #d2691e;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+            display: none;
+            text-shadow: 
+                0 0 10px rgba(210, 105, 30, 0.5),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <h1>⚔️ Create Your Hero ⚔️</h1>
+        <p class="subtitle">Begin your legendary adventure</p>
+
+        <form id="characterForm">
+            <div class="form-group">
+                <label for="characterName">Character Name</label>
+                <input type="text" id="characterName" placeholder="Enter your hero's name..." required>
+            </div>
+
+            <div class="form-group">
+                <label>Choose Gender</label>
+                <div class="gender-selection">
+                    <div class="gender-card" data-gender="Male">
+                        <div class="gender-icon">♂️</div>
+                        <h3>Male</h3>
+                    </div>
+                    <div class="gender-card" data-gender="Female">
+                        <div class="gender-icon">♀️</div>
+                        <h3>Female</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Choose Your Race</label>
+                <div class="selection-grid">
+                    <div class="selection-card" data-race="Human">
+                        <h3>Human</h3>
+                        <p>+1 to all stats</p>
+                    </div>
+                    <div class="selection-card" data-race="Elf">
+                        <h3>Elf</h3>
+                        <p>+2 DEX, +1 INT</p>
+                    </div>
+                    <div class="selection-card" data-race="Dwarf">
+                        <h3>Dwarf</h3>
+                        <p>+2 CON, +1 WIS</p>
+                    </div>
+                    <div class="selection-card" data-race="Halfling">
+                        <h3>Halfling</h3>
+                        <p>+2 DEX, +1 CHA</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>⚔️ SELECT YOUR CLASS ⚔️</label>
+                <div class="tekken-class-grid">
+                    <div class="tekken-class-card" data-class="Warrior">
+                        <div class="class-portrait warrior-bg">
+                            <div class="class-icon">⚔️</div>
+                            <div class="class-overlay">
+                                <h2>WARRIOR</h2>
+                                <p class="class-subtitle">Master of Combat</p>
+                                <div class="class-stats">
+                                    <span>STR: ⭐⭐⭐⭐⭐</span>
+                                    <span>CON: ⭐⭐⭐⭐</span>
+                                    <span>INT: ⭐⭐</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tekken-class-card" data-class="Rogue">
+                        <div class="class-portrait rogue-bg">
+                            <div class="class-icon">🗡️</div>
+                            <div class="class-overlay">
+                                <h2>ROGUE</h2>
+                                <p class="class-subtitle">Shadow Assassin</p>
+                                <div class="class-stats">
+                                    <span>DEX: ⭐⭐⭐⭐⭐</span>
+                                    <span>CHA: ⭐⭐⭐⭐</span>
+                                    <span>STR: ⭐⭐</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tekken-class-card" data-class="Mage">
+                        <div class="class-portrait mage-bg">
+                            <div class="class-icon">🔮</div>
+                            <div class="class-overlay">
+                                <h2>MAGE</h2>
+                                <p class="class-subtitle">Arcane Sorcerer</p>
+                                <div class="class-stats">
+                                    <span>INT: ⭐⭐⭐⭐⭐</span>
+                                    <span>WIS: ⭐⭐⭐⭐</span>
+                                    <span>CON: ⭐⭐</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tekken-class-card" data-class="Cleric">
+                        <div class="class-portrait cleric-bg">
+                            <div class="class-icon">✨</div>
+                            <div class="class-overlay">
+                                <h2>CLERIC</h2>
+                                <p class="class-subtitle">Divine Healer</p>
+                                <div class="class-stats">
+                                    <span>WIS: ⭐⭐⭐⭐⭐</span>
+                                    <span>CON: ⭐⭐⭐⭐</span>
+                                    <span>STR: ⭐⭐⭐</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overview-card" id="overviewCard" style="display: none;">
+                <h3 class="overview-title">⚔️ CHARACTER OVERVIEW ⚔️</h3>
+                <div class="overview-content">
+                    <div class="overview-row">
+                        <span class="overview-label">Name:</span>
+                        <span class="overview-value" id="overviewName">-</span>
+                    </div>
+                    <div class="overview-row">
+                        <span class="overview-label">Gender:</span>
+                        <span class="overview-value" id="overviewGender">-</span>
+                    </div>
+                    <div class="overview-row">
+                        <span class="overview-label">Race:</span>
+                        <span class="overview-value" id="overviewRace">-</span>
+                    </div>
+                    <div class="overview-row">
+                        <span class="overview-label">Class:</span>
+                        <span class="overview-value" id="overviewClass">-</span>
+                    </div>
+                </div>
+                <div class="overview-ready">
+                    <span class="ready-icon">✓</span>
+                    <span class="ready-text">Ready to die</span>
+                </div>
+            </div>
+
+            <p class="error-message" id="errorMessage">Please fill in all fields!</p>
+
+            <button type="submit" class="create-btn" id="createBtn" style="opacity: 0.5; pointer-events: none;">🎲 Create Character 🎲</button>
+        </form>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">Forging your destiny...</div>
+        </div>
+    </div>
+
+    <script src="dnd.js"></script>
+</body>
+</html>
+

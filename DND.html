@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salvador Silang - Character Sheet</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+          
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* MP badge shown on skill buttons */
+        .mp-badge {
+            background: #274a92;
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 6px;
+            font-size: 0.85em;
+            display: inline-block;
+        }
+
+        body {
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(139, 90, 43, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(205, 133, 63, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0805 0%, #1a1410 50%, #0a0805 100%);
+
+            font-family: 'MedievalSharp', cursive;
+            color: #e8d5b7;
+            padding: 40px 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139, 90, 43, 0.03) 2px,
+                    rgba(139, 90, 43, 0.03) 4px
+                );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(205, 133, 63, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .sheet {
+            border: 4px solid;
+            border-image: linear-gradient(135deg, #cd853f 0%, #8b5a2b 50%, #cd853f 100%) 1;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 1200px;
+            margin: auto;
+            background: 
+                linear-gradient(135deg, rgba(26, 20, 16, 0.98) 0%, rgba(43, 31, 23, 0.98) 50%, rgba(26, 20, 16, 0.98) 100%);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.7),
+                0 0 80px rgba(139, 90, 43, 0.3);
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .sheet:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 25px 70px rgba(0, 0, 0, 0.8),
+                0 0 100px rgba(139, 90, 43, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .sheet {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em !important;
+            }
+
+            h2 {
+                font-size: 1em !important;
+            }
+
+            h3 {
+                font-size: 1em !important;
+            }
+
+            .stats {
+                flex-direction: column !important;
+                gap: 15px;
+            }
+
+            .section {
+                width: 100% !important;
+            }
+
+            .attribute-list {
+                grid-template-columns: 1fr !important;
+                gap: 8px !important;
+            }
+
+            .inventory-grid {
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 5px !important;
+            }
+
+            .inventory-slot {
+                font-size: 10px !important;
+            }
+
+            .level-badge {
+                transform: scale(0.85);
+            }
+
+            .chain-top,
+            .chain-bottom {
+                font-size: 20px !important;
+            }
+
+            .level-value {
+                font-size: 32px !important;
+            }
+
+            .plus-btn {
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 14px !important;
+            }
+
+            .remaining-points {
+                font-size: 16px !important;
+                padding: 8px !important;
+            }
+
+            .trait-modal-content {
+                padding: 20px !important;
+                width: 95% !important;
+            }
+
+            .trait-item {
+                padding: 10px !important;
+            }
+
+            .plus-btn,
+            .trait-item,
+            .close-btn {
+                touch-action: manipulation;
+            }
+
+            .inventory-slot img {
+                width: 100%;
+                height: 100%;
+            }
+
+            .bar-container {
+                height: 25px !important;
+            }
+
+            .bar-fill {
+                font-size: 12px !important;
+            }
+
+            .attribute-line {
+                padding: 8px !important;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sheet {
+                max-width: 95%;
+                padding: 20px;
+            }
+
+            .inventory-grid {
+                grid-template-columns: repeat(8, 1fr) !important;
+            }
+
+            .stats {
+                flex-wrap: wrap;
+            }
+
+            .section {
+                width: 48% !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .inventory-grid {
+                grid-template-columns: repeat(10, 1fr);
+            }
+        }
+
+        .sheet::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #8b5a2b, #cd853f, #8b5a2b, #5c3a1e);
+            border-radius: 10px;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 3.2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700 0%, #cd853f 50%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px rgba(205, 133, 63, 0.6));
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #d4af7a;
+            font-size: 1.3em;
+            text-shadow: 
+                0 0 15px rgba(212, 175, 122, 0.5),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+            letter-spacing: 1px;
+        }
+
+        h3 {
+            color: #e6a847;
+            font-size: 1.5em;
+            text-shadow: 
+                0 0 15px rgba(230, 168, 71, 0.6),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #cd853f 0%, transparent 100%);
+            border-radius: 2px;
+        }
+
+        .character-info-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .level-badge {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .chain-top {
+            font-size: 24px;
+            filter: drop-shadow(0 2px 5px rgba(139, 90, 43, 0.6));
+            animation: swayChain 3s ease-in-out infinite;
+        }
+
+        .chain-bottom {
+            font-size: 24px;
+            filter: drop-shadow(0 2px 5px rgba(139, 90, 43, 0.6));
+            animation: swayChain 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes swayChain {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(3px); }
+        }
+
+        .level-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: 
+                radial-gradient(circle at center, rgba(43, 31, 23, 0.9) 0%, rgba(26, 20, 16, 0.9) 100%);
+            border: 5px solid;
+            border-image: linear-gradient(135deg, #ffd700 0%, #cd853f 50%, #8b5a2b 100%) 1;
+            border-radius: 16px;
+            padding: 20px 40px;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(205, 133, 63, 0.5),
+                inset 0 0 30px rgba(0, 0, 0, 0.7),
+                inset 0 2px 10px rgba(255, 215, 0, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .level-content:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.9),
+                0 0 60px rgba(205, 133, 63, 0.7),
+                inset 0 0 30px rgba(0, 0, 0, 0.7),
+                inset 0 2px 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .level-content::before,
+        .level-content::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #5c3a1e 0%, #3d2412 100%);
+            border: 3px solid #8b5a2b;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 10px rgba(139, 90, 43, 0.8),
+                inset 0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        .level-content::before {
+            left: -12px;
+            top: -12px;
+        }
+
+        .level-content::after {
+            right: -12px;
+            top: -12px;
+        }
+
+        .level-label {
+            font-size: 11px;
+            color: #8b5a2b;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 0 5px rgba(139, 90, 43, 0.4),
+                1px 1px 2px rgba(0, 0, 0, 0.9);
+        }
+
+        .level-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .level-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: #cd853f;
+            text-shadow: 
+                0 0 20px rgba(205, 133, 63, 0.8),
+                3px 3px 6px rgba(0, 0, 0, 0.9);
+            line-height: 1;
+        }
+
+        .lock-icon {
+            position: absolute;
+            font-size: 16px;
+            bottom: -8px;
+            right: -18px;
+            filter: drop-shadow(0 0 8px rgba(139, 90, 43, 0.8));
+            animation: lockGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes lockGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 8px rgba(139, 90, 43, 0.8));
+                transform: scale(1);
+            }
+            50% { 
+                filter: drop-shadow(0 0 15px rgba(205, 133, 63, 1));
+                transform: scale(1.1);
+            }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .section {
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #8b5a2b 0%, #5c3a1e 50%, #8b5a2b 100%) 1;
+            border-radius: 15px;
+            padding: 25px;
+            background: 
+                linear-gradient(135deg, rgba(13, 9, 6, 0.95) 0%, rgba(26, 20, 16, 0.95) 100%);
+            width: 45%;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(139, 90, 43, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(205, 133, 63, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.7),
+                0 0 40px rgba(139, 90, 43, 0.3);
+        }
+
+        .section:hover::before {
+            left: 100%;
+        }
+
+        .inventory-section {
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #8b5a2b 0%, #5c3a1e 50%, #8b5a2b 100%) 1;
+            border-radius: 15px;
+            padding: 25px;
+            background: 
+                linear-gradient(135deg, rgba(13, 9, 6, 0.95) 0%, rgba(26, 20, 16, 0.95) 100%);
+            margin-top: 30px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(139, 90, 43, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inventory-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(205, 133, 63, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .inventory-section:hover::before {
+            left: 100%;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            width: 100%;
+            margin: auto;
+        }
+
+        .inventory-slot {
+            aspect-ratio: 1;
+            border: 2px solid #3d2412;
+            background: 
+                radial-gradient(circle at center, rgba(26, 20, 16, 0.6) 0%, rgba(13, 9, 6, 0.9) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #c9b896;
+            text-shadow: 
+                0 0 5px rgba(205, 133, 63, 0.3),
+                1px 1px 2px #000;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.8),
+                0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .inventory-slot::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(205, 133, 63, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .inventory-slot:hover::before {
+            opacity: 1;
+        }
+
+        .inventory-slot img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px rgba(205, 133, 63, 0.3));
+        }
+
+        .inventory-slot:hover {
+            border-color: #cd853f;
+            box-shadow: 
+                0 0 25px rgba(205, 133, 63, 0.6),
+                0 5px 15px rgba(139, 90, 43, 0.4),
+                inset 0 2px 6px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(205, 133, 63, 0.1);
+            transform: scale(1.1) translateY(-2px);
+        }
+
+        .inventory-slot.filled {
+            background: 
+                radial-gradient(circle at center, rgba(43, 31, 23, 0.8) 0%, rgba(26, 20, 16, 0.9) 100%);
+            border-color: #8b5a2b;
+            box-shadow: 
+                0 0 15px rgba(139, 90, 43, 0.4),
+                0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .inventory-slot.filled:hover {
+            border-color: #ffd700;
+            box-shadow: 
+                0 0 25px rgba(255, 215, 0, 0.6),
+                0 5px 15px rgba(205, 133, 63, 0.5);
+            transform: scale(1.12) translateY(-2px);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px);
+            background: 
+                linear-gradient(135deg, rgba(43, 31, 23, 0.98) 0%, rgba(26, 20, 16, 0.98) 100%);
+            backdrop-filter: blur(8px);
+            color: #e8d5b7;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #cd853f 0%, #8b5a2b 100%) 1;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.8),
+                0 0 30px rgba(205, 133, 63, 0.5),
+                inset 0 1px 4px rgba(205, 133, 63, 0.2);
+            text-shadow: 
+                0 0 8px rgba(205, 133, 63, 0.4),
+                1px 1px 3px rgba(0, 0, 0, 0.9);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: #8b5a2b;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .inventory-slot:hover .tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        ul {
+            list-style-type: square;
+            padding-left: 20px;
+        }
+
+        .bar {
+            height: 30px;
+            background: 
+                linear-gradient(135deg, #0a0805 0%, #1a1410 100%);
+            border: 3px solid #3d2412;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 
+                inset 0 3px 8px rgba(0, 0, 0, 0.9),
+                0 2px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            border-radius: 15px 15px 0 0;
+            pointer-events: none;
+        }
+
+        .hp-bar {
+            background: 
+                linear-gradient(90deg, #c41e3a 0%, #ff4500 50%, #c41e3a 100%);
+            height: 100%;
+            width: 100%;
+            box-shadow: 
+                0 0 15px rgba(196, 30, 58, 0.5),
+                inset 0 2px 4px rgba(255, 100, 70, 0.3);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .mp-bar {
+            background: 
+                linear-gradient(90deg, #1e90ff 0%, #4169e1 50%, #1e90ff 100%);
+            height: 100%;
+            width: 100%;
+            box-shadow: 
+                0 0 15px rgba(30, 144, 255, 0.5),
+                inset 0 2px 4px rgba(100, 180, 255, 0.3);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .attribute-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px 25px;
+            font-size: 19px;
+        }
+
+        .attribute-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: 
+                linear-gradient(135deg, rgba(26, 20, 16, 0.4) 0%, rgba(13, 9, 6, 0.4) 100%);
+            border-radius: 10px;
+            border: 2px solid rgba(139, 90, 43, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .attribute-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(205, 133, 63, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .attribute-item:hover {
+            border-color: rgba(205, 133, 63, 0.4);
+            box-shadow: 0 4px 12px rgba(139, 90, 43, 0.3);
+            transform: translateX(5px);
+        }
+
+        .attribute-item:hover::before {
+            left: 100%;
+        }
+
+        .attribute-item strong {
+            color: #e8d5b7;
+            text-shadow: 
+                0 0 10px rgba(232, 213, 183, 0.4),
+                2px 2px 3px rgba(0, 0, 0, 0.9);
+            font-size: 1.1em;
+        }
+
+        .attribute-item span {
+            color: #ffd700;
+            text-shadow: 
+                0 0 12px rgba(255, 215, 0, 0.6),
+                2px 2px 3px rgba(0, 0, 0, 0.9);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .section p {
+            color: #a0826d;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Trait System Styles */
+        .trait-item {
+            background: linear-gradient(135deg, #0d0906 0%, #1a1410 100%);
+            border: 2px solid #5c3a1e;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s;
+        }
+
+        .trait-item:hover {
+            border-color: #8b5a2b;
+            box-shadow: 
+                0 0 10px rgba(139, 90, 43, 0.4),
+                inset 0 2px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .trait-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .trait-header strong {
+            color: #cd853f;
+            font-size: 1.1em;
+            text-shadow: 
+                0 0 8px rgba(205, 133, 63, 0.4),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .trait-badge {
+            background: #5c3a1e;
+            color: #cd853f;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border: 1px solid #8b5a2b;
+        }
+
+        .trait-desc {
+            color: #a0826d;
+            font-size: 0.9em;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Trait Modal */
+        .trait-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .trait-modal-content {
+            background: linear-gradient(135deg, #1a1410 0%, #2b1f17 50%, #1a1410 100%);
+            border: 4px solid #8b5a2b;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 0 50px rgba(139, 90, 43, 0.8),
+                inset 0 2px 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .trait-modal-content h2 {
+            color: #cd853f;
+            text-align: center;
+            margin: 0 0 15px 0;
+            font-size: 2em;
+            text-shadow: 
+                0 0 15px rgba(205, 133, 63, 0.6),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        .trait-selection-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .trait-card {
+            background: linear-gradient(135deg, #0d0906 0%, #1a1410 100%);
+            border: 2px solid #5c3a1e;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .trait-card:hover {
+            border-color: #8b5a2b;
+            box-shadow: 0 0 15px rgba(139, 90, 43, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .trait-card h4 {
+            color: #cd853f;
+            font-size: 1.3em;
+            margin: 0 0 8px 0;
+            text-shadow: 
+                0 0 10px rgba(205, 133, 63, 0.4),
+                1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .trait-requirement {
+            color: #8b5a2b;
+            font-size: 0.9em;
+            margin: 0 0 10px 0;
+            font-style: italic;
+        }
+
+        .trait-description {
+            color: #a0826d;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+
+        .trait-select-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #5c3a1e 0%, #3d2412 100%);
+            border: 2px solid #8b5a2b;
+            border-radius: 8px;
+            color: #c9b896;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .trait-select-btn:hover {
+            background: linear-gradient(135deg, #8b5a2b 0%, #5c3a1e 100%);
+            border-color: #cd853f;
+            box-shadow: 0 0 15px rgba(205, 133, 63, 0.6);
+            transform: scale(1.02);
+        }
+
+        .trait-select-btn:active {
+            transform: scale(0.98);
+        }
+
+        .plus-btn {
+            background: 
+                radial-gradient(circle at center, #8b5a2b 0%, #5c3a1e 70%);
+            color: #ffd700;
+            border: 3px solid #8b5a2b;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 10px rgba(0, 0, 0, 0.6),
+                0 0 15px rgba(139, 90, 43, 0.3),
+                inset 0 2px 4px rgba(205, 133, 63, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+            text-shadow: 
+                0 0 10px rgba(255, 215, 0, 0.6),
+                2px 2px 3px rgba(0, 0, 0, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plus-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .plus-btn:hover {
+            background: 
+                radial-gradient(circle at center, #cd853f 0%, #8b5a2b 70%);
+            border-color: #ffd700;
+            transform: scale(1.2) rotate(90deg);
+            box-shadow: 
+                0 6px 15px rgba(0, 0, 0, 0.7),
+                0 0 25px rgba(255, 215, 0, 0.6),
+                inset 0 2px 4px rgba(255, 215, 0, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .plus-btn:hover::before {
+            opacity: 1;
+        }
+
+        .plus-btn:active {
+            transform: scale(1) rotate(90deg);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.8),
+                0 0 15px rgba(255, 215, 0, 0.4),
+                inset 0 2px 6px rgba(0, 0, 0, 0.8);
+        }
+
+        .remaining-points {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: 
+                radial-gradient(ellipse at center, rgba(43, 31, 23, 0.9) 0%, rgba(26, 20, 16, 0.9) 100%);
+            border-radius: 12px;
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #ffd700 0%, #cd853f 50%, #ffd700 100%) 1;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.7),
+                0 0 30px rgba(255, 215, 0, 0.4);
+            text-shadow: 
+                0 0 15px rgba(255, 215, 0, 0.8),
+                2px 2px 4px rgba(0, 0, 0, 0.9);
+            position: relative;
+        }
+
+        .remaining-points span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .close-btn:hover {
+            background: linear-gradient(135deg, #8b5a2b 0%, #5c3a1e 100%) !important;
+            border-color: #cd853f !important;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(205, 133, 63, 0.6);
+        }
+
+        .close-btn:active {
+            transform: scale(0.95) !important;
+        }
+    </style>
+
+    </head>
+
+    <body>
+        <div class="sheet">
+            <h1 id="characterName">Salvador Silang</h1>
+            <div class="character-info-container">
+                <h2 id="characterInfo">♂️ Male | Race: Human | Class: Rogue</h2>
+                <div class="level-badge">
+                    <div class="chain-top">⛓️</div>
+                    <div class="level-content">
+                        <span class="level-label">LEVEL</span>
+                        <div class="level-box">
+                            <span class="level-value" id="characterLevel">1</span>
+                            <div class="lock-icon">🔒</div>
+                        </div>
+                    </div>
+                    <div class="chain-bottom">⛓️</div>
+                </div>
+                <!-- Controls: Create / Play / Load -->
+                <div class="controls" style="margin-top:12px; display:flex; gap:10px; justify-content:center;">
+                    <button id="newBtn" class="trait-select-btn" onclick="createNewCharacter()" title="Create a new character">Create New Character</button>
+                    <button id="playBtn" class="trait-select-btn" onclick="openBattle()" title="Play the Battle mini-game">Play Battle</button>
+                    <button id="loadBtn" class="trait-select-btn" onclick="openSavedCharactersModal()" title="Load a character from your library or import">Load Character</button>
+                    <input type="file" id="characterFileInput" accept="application/json" style="display:none" onchange="handleCharacterFile(event)">
+                </div>
+            </div>
+
+                <!-- Bag Modal (use items during battle) -->
+                <div id="bagModal" class="trait-modal">
+                    <div class="trait-modal-content" style="max-width:520px; text-align:left; position:relative;">
+                        <button class="close-btn" onclick="closeBagModal()" style="position: absolute; top: 12px; right: 12px; background: transparent; border: 2px solid #8b5a2b; color: #cd853f; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px;">✕</button>
+                        <h2 style="color:#cd853f; text-align:center; margin-top:6px;">Bag</h2>
+                        <p id="bagModalDescription" style="color:#a0826d; text-align:center; margin-bottom:10px;">Use items from your inventory.</p>
+                        <div id="bagList" style="display:flex; flex-direction:column; gap:10px; max-height:50vh; overflow:auto; padding:6px;"></div>
+                        <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+                            <button class="trait-select-btn" onclick="closeBagModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <!-- Saved Characters Modal (library) -->
+        <div id="savedCharactersModal" class="trait-modal">
+            <div class="trait-modal-content" style="max-width:800px; width:90%;">
+                <button class="close-btn" onclick="closeSavedCharactersModal()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: 2px solid #8b5a2b; color: #cd853f; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: bold; transition: all 0.3s;">✕</button>
+                <h2 style="color:#cd853f; text-align:center; margin-top:6px;">Load Character</h2>
+                <p style="color:#a0826d; text-align:center; margin-bottom:12px;">Select a saved character from your library or import a character JSON file.</p>
+
+                <div style="display:flex; gap:12px; justify-content:center; margin-bottom:14px;">
+                    <button class="trait-select-btn" onclick="triggerLoadCharacter()">Import JSON</button>
+                    <button class="trait-select-btn" onclick="exportAllCharacters()">Export All</button>
+                </div>
+
+                <div id="savedCharactersContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px; max-height:60vh; overflow:auto; padding:8px;">
+                    <!-- saved characters rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Battle Mini-Game Modal (Pokémon-like turn based) -->
+        <div id="battleModal" class="trait-modal" style="z-index:3000;">
+            <div class="trait-modal-content" style="max-width:900px; width:95%; padding:18px;">
+                <button class="close-btn" onclick="closeBattle()" style="position:absolute; top:12px; right:12px; background:transparent; border:2px solid #8b5a2b; color:#cd853f; width:36px; height:36px; border-radius:50%; font-size:18px;">✕</button>
+                <h2 id="battleTitle" style="color:#cd853f; text-align:center; margin-top:6px;">Battle — Turn Based</h2>
+                <div style="display:flex; gap:12px; align-items:flex-start; margin-top:12px;">
+                    <div id="battleArea" style="flex:1; display:flex; gap:12px; align-items:center; justify-content:space-between;">
+                        <div id="playerPane" style="width:45%; background:linear-gradient(135deg,#0d0906,#1a1410); border:2px solid #5c3a1e; padding:12px; border-radius:8px; text-align:center; color:#c9b896;">
+                            <div id="playerName" style="font-weight:bold; color:#ffd700; margin-bottom:8px;">Hero</div>
+                            <div id="playerSprite" style="width:160px; height:120px; margin:0 auto 8px; background:#111; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:48px;">🙂</div>
+                            <div style="margin-bottom:8px; text-align:left;"><small>HP</small><div class="bar" style="margin-top:6px;"><div class="hp-bar" id="playerHPBar"></div></div><div id="playerHPText" style="text-align:right; font-size:12px;">100 / 100</div></div>
+                            <div style="margin-bottom:8px; text-align:left;"><small>MP</small><div class="bar" style="margin-top:6px;"><div class="mp-bar" id="playerMPBar"></div></div><div id="playerMPText" style="text-align:right; font-size:12px;">50 / 50</div></div>
+                        </div>
+
+                        <div id="enemyPane" style="width:45%; background:linear-gradient(135deg,#0d0906,#1a1410); border:2px solid #5c3a1e; padding:12px; border-radius:8px; text-align:center; color:#c9b896;">
+                            <div id="enemyName" style="font-weight:bold; color:#ff6b6b; margin-bottom:8px;">???</div>
+                            <div id="enemySprite" style="width:160px; height:120px; margin:0 auto 8px; background:linear-gradient(135deg,#0d0906,#1a1410); border:2px solid #3d2412; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:72px; text-shadow:0 0 20px rgba(255,107,107,0.6); transition: all 0.3s ease;">❓</div>
+                            <div style="margin-bottom:8px; text-align:left;"><small>HP</small><div class="bar" style="margin-top:6px;"><div class="hp-bar" id="enemyHPBar"></div></div><div id="enemyHPText" style="text-align:right; font-size:12px;">0 / 0</div></div>
+                            <div style="margin-bottom:8px; text-align:left;"><small>MP</small><div class="bar" style="margin-top:6px;"><div class="mp-bar" id="enemyMPBar"></div></div><div id="enemyMPText" style="text-align:right; font-size:12px;">0 / 0</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:12px;">
+                    <div style="flex:1; background:linear-gradient(135deg,#1a1410,#2b1f17); border:2px solid #5c3a1e; padding:10px; border-radius:8px; color:#c9b896;">
+                        <div id="battleMessage" style="color:#ffd700; text-align:center; font-weight:bold; min-height:36px;">Choose your action</div>
+                        <div id="actionMenu" style="display:flex; gap:8px; margin-top:8px; justify-content:center;">
+                            <button class="trait-select-btn action-btn" data-action="fight">Fight</button>
+                            <button class="trait-select-btn action-btn" data-action="bag">Bag</button>
+                            <button class="trait-select-btn action-btn" data-action="party">Party</button>
+                            <button class="trait-select-btn action-btn" data-action="run">Run</button>
+                        </div>
+
+                        <div id="movesMenu" style="display:none; margin-top:10px; gap:8px; justify-content:center; grid-template-columns: repeat(2, 1fr);">
+                            <!-- Move buttons injected here -->
+                        </div>
+                    </div>
+                    <div style="width:260px; min-width:200px; background:linear-gradient(135deg,#1a1410,#2b1f17); border:2px solid #5c3a1e; padding:10px; border-radius:8px; color:#c9b896;">
+                        <div style="margin-bottom:8px;"><strong>Turn:</strong> <span id="battleTurn">Player</span></div>
+                        <div style="margin-bottom:8px;"><strong>Player HP:</strong> <span id="battlePlayerHP">100</span></div>
+                        <div style="margin-bottom:8px;"><strong>Enemy HP:</strong> <span id="battleEnemyHP">80</span></div>
+                        <div style="margin-top:12px; display:flex; gap:8px;">
+                            <button class="trait-select-btn" onclick="startBattle()">Restart</button>
+                            <button class="trait-select-btn" onclick="closeBattle()">Exit</button>
+                        </div>
+                        <p style="color:#a0826d; font-size:12px; margin-top:10px;">Turn-based actions. Pick Fight to select a move.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="section">
+                <h3>Attributes</h3>
+                <div class="attribute-list">
+                    <div class="attribute-item">
+                        <strong>STR: <span id="str-value">13</span></strong>
+                        <button class="plus-btn" onclick="increaseAttribute('str')">+</button>
+                    </div>
+                    <div class="attribute-item">
+                        <strong>DEX: <span id="dex-value">15</span></strong>
+                        <button class="plus-btn" onclick="increaseAttribute('dex')">+</button>
+                    </div>
+                    <div class="attribute-item">
+                        <strong>CON: <span id="con-value">8</span></strong>
+                        <button class="plus-btn" onclick="increaseAttribute('con')">+</button>
+                    </div>
+                    <div class="attribute-item">
+                        <strong>INT: <span id="int-value">14</span></strong>
+                        <button class="plus-btn" onclick="increaseAttribute('int')">+</button>
+                    </div>
+                    <div class="attribute-item">
+                        <strong>WIS: <span id="wis-value">12</span></strong>
+                        <button class="plus-btn" onclick="increaseAttribute('wis')">+</button>
+                    </div>
+                    <div class="attribute-item">
+                        <strong>CHA: <span id="cha-value">10</span></strong>
+                        <button class="plus-btn" onclick="increaseAttribute('cha')">+</button>
+                    </div>
+                </div>
+                <div class="remaining-points">
+                    Points Remaining: <span id="points-remaining">10</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>HP</h3>
+                <div class="bar"><div class="hp-bar" id="hpBar"></div></div>
+                <p id="hpText">100 / 100</p>
+                <h3>MP</h3>
+                <div class="bar"><div class="mp-bar" id="mpBar"></div></div>
+                <p id="mpText">50 / 50</p>
+            </div>
+        </div>
+
+        <div class="inventory-section">
+            <h3 style="text-align: center;">Inventory</h3>
+            <div class="inventory-grid" id="inventoryGrid">
+            </div>
+        </div>
+
+        <div class="inventory-section" style="margin-top: 20px;">
+            <h3 style="text-align: center;">⭐ Character Traits ⭐</h3>
+            <div id="traitsContainer" style="padding: 15px;">
+                <p style="color: #a0826d; text-align: center;">No traits selected yet</p>
+            </div>
+        </div>
+
+        <div id="traitModal" class="trait-modal">
+            <div class="trait-modal-content">
+                <h2 id="traitModalTitle">New Trait Available!</h2>
+                <p style="color: #a0826d; text-align: center; margin-bottom: 20px;">
+                    You've reached a milestone! Choose a trait to enhance your character.
+                </p>
+                <div id="traitList" class="trait-selection-list"></div>
+            </div>
+        </div>
+
+        <!-- Loot Modal (shows items acquired after battle) -->
+        <div id="lootModal" class="trait-modal">
+            <div class="trait-modal-content" style="max-width:520px; text-align:left; position:relative;">
+                <button class="close-btn" onclick="closeLootModal()" style="position: absolute; top: 12px; right: 12px; background: transparent; border: 2px solid #8b5a2b; color: #cd853f; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px;">✕</button>
+                <h2 style="color:#cd853f; text-align:center; margin-top:6px;">Loot Acquired</h2>
+                <p id="lootModalDescription" style="color:#a0826d; text-align:center; margin-bottom:10px;">You found the following items:</p>
+                <div id="lootList" style="display:flex; flex-direction:column; gap:10px; max-height:50vh; overflow:auto; padding:6px;"></div>
+                <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+                    <button class="trait-select-btn" onclick="closeLootModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loot Editor Modal (tweak loot weights/rarities) -->
+        <div id="lootEditorModal" class="trait-modal">
+            <div class="trait-modal-content" style="max-width:720px; text-align:left; position:relative;">
+                <button class="close-btn" onclick="closeLootEditor()" style="position: absolute; top: 12px; right: 12px; background: transparent; border: 2px solid #8b5a2b; color: #cd853f; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px;">✕</button>
+                <h2 style="color:#cd853f; text-align:center; margin-top:6px;">Loot Editor</h2>
+                <p style="color:#a0826d; text-align:center; margin-bottom:10px;">Adjust loot weights and rarities for each enemy. Click Save to persist overrides.</p>
+                <div id="lootEditorList" style="max-height:60vh; overflow:auto; display:flex; flex-direction:column; gap:8px; padding:6px;"></div>
+                <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+                    <button class="trait-select-btn" onclick="saveLootEditor()">Save Overrides</button>
+                    <button class="trait-select-btn" onclick="resetLootOverrides()">Reset Overrides</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="itemModal" class="trait-modal" onclick="closeItemModal(event)">
+            <div class="trait-modal-content" style="max-width: 400px; text-align: center;" onclick="event.stopPropagation()">
+                <button class="close-btn" onclick="closeItemModal()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: 2px solid #8b5a2b; color: #cd853f; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: bold; transition: all 0.3s;">✕</button>
+                <div id="itemModalImage" style="margin: 20px auto; width: 128px; height: 128px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0d0906 0%, #1a1410 100%); border: 3px solid #8b5a2b; border-radius: 10px; padding: 10px;">
+                    <img src="" alt="" style="max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(205, 133, 63, 0.5));">
+                </div>
+                <h2 id="itemModalName" style="color: #cd853f; margin: 15px 0; font-size: 1.8em;">Item Name</h2>
+                <p id="itemModalDescription" style="color: #a0826d; line-height: 1.6; font-size: 1.1em; margin: 20px 0;">Item description goes here</p>
+            </div>
+        </div>
+
+        <script src="dnd.js"></script>
+        <script src="dnd-battle.js"></script>
+    </body>
