@@ -574,18 +574,83 @@ function useItemFromBag(index) {
     alert('This item cannot be used from the bag in the current implementation.');
 }
 
+// Create inventory slots (renders the inventory grid)
+function createInventorySlots() {
+    const inventoryGrid = document.getElementById('inventoryGrid');
+    if (!inventoryGrid) return;
+
+    inventoryGrid.innerHTML = '';
+    
+    // Create 50 slots (5 rows x 10 columns)
+    const maxSlots = 50;
+    for (let i = 0; i < maxSlots; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'inventory-slot';
+        
+        // If there's an item in this slot
+        if (i < inventoryItems.length && inventoryItems[i]) {
+            const item = inventoryItems[i];
+            slot.classList.add('filled');
+            
+            // Create image element
+            if (item.image) {
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name || 'Item';
+                img.onerror = function() {
+                    // If image fails to load, show emoji fallback
+                    this.style.display = 'none';
+                    slot.textContent = '📦';
+                };
+                slot.appendChild(img);
+            } else {
+                // No image, show emoji
+                slot.textContent = '📦';
+            }
+            
+            // Add equipped indicator
+            if (item.equipped) {
+                const equippedBadge = document.createElement('div');
+                equippedBadge.textContent = '✓';
+                equippedBadge.style.position = 'absolute';
+                equippedBadge.style.top = '2px';
+                equippedBadge.style.right = '2px';
+                equippedBadge.style.fontSize = '10px';
+                equippedBadge.style.color = '#00ff00';
+                equippedBadge.style.textShadow = '0 0 5px #00ff00';
+                slot.style.position = 'relative';
+                slot.appendChild(equippedBadge);
+            }
+            
+            // Create tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.innerHTML = `<strong>${item.name || 'Item'}</strong><br>${item.description || ''}`;
+            slot.appendChild(tooltip);
+            
+            // Setup hold-click functionality
+            setupItemHoldClick(slot, item, i);
+        } else {
+            // Empty slot
+            slot.textContent = '';
+        }
+        
+        inventoryGrid.appendChild(slot);
+    }
+}
+
 // Hold-click functionality for items
 let holdTimer = null;
 let isHolding = false;
 
-function setupItemHoldClick(slotElement, item) {
+function setupItemHoldClick(slotElement, item, index) {
     // Mouse events (desktop)
     slotElement.addEventListener('mousedown', function(e) {
         e.preventDefault();
         isHolding = true;
         holdTimer = setTimeout(() => {
             if (isHolding) {
-                showItemModal(item);
+                showItemModal(item, index);
             }
         }, 500); // Hold for 500ms
     });
@@ -599,7 +664,7 @@ function setupItemHoldClick(slotElement, item) {
         isHolding = true;
         holdTimer = setTimeout(() => {
             if (isHolding) {
-                showItemModal(item);
+                showItemModal(item, index);
             }
         }, 500); // Hold for 500ms
     });
@@ -716,6 +781,204 @@ function closeItemModal(event) {
         if (!event || event.target === modal) {
             modal.style.display = 'none';
         }
+    }
+}
+
+// Update HP bar display
+function updateHPBar() {
+    const hpBar = document.getElementById('hpBar');
+    const hpText = document.getElementById('hpText');
+    if (hpBar) {
+        const percentage = (currentHP / maxHP) * 100;
+        hpBar.style.width = percentage + '%';
+    }
+    if (hpText) {
+        hpText.textContent = `${Math.round(currentHP)} / ${maxHP}`;
+    }
+}
+
+// Update MP bar display
+function updateMPBar() {
+    const mpBar = document.getElementById('mpBar');
+    const mpText = document.getElementById('mpText');
+    if (mpBar) {
+        const percentage = (currentMP / maxMP) * 100;
+        mpBar.style.width = percentage + '%';
+    }
+    if (mpText) {
+        mpText.textContent = `${Math.round(currentMP)} / ${maxMP}`;
+    }
+}
+
+// Update traits display
+function updateTraitsDisplay() {
+    const container = document.getElementById('traitsContainer');
+    if (!container) return;
+
+    if (!selectedTraits || selectedTraits.length === 0) {
+        container.innerHTML = '<p style="color: #a0826d; text-align: center;">No traits selected yet</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    selectedTraits.forEach(trait => {
+        const traitDiv = document.createElement('div');
+        traitDiv.className = 'trait-item';
+        traitDiv.innerHTML = `
+            <div class="trait-header">
+                <strong>${trait.name}</strong>
+                <span class="trait-badge">${trait.source || 'Trait'}</span>
+            </div>
+            <p class="trait-desc">${trait.description}</p>
+        `;
+        container.appendChild(traitDiv);
+    });
+}
+
+// Increase attribute (spend points)
+function increaseAttribute(attr) {
+    if (remainingPoints <= 0) {
+        alert('No points remaining!');
+        return;
+    }
+
+    // Increase the attribute
+    attributes[attr]++;
+    remainingPoints--;
+
+    // Update displays
+    const valueElement = document.getElementById(`${attr}-value`);
+    if (valueElement) {
+        valueElement.textContent = attributes[attr];
+    }
+
+    const pointsElement = document.getElementById('points-remaining');
+    if (pointsElement) {
+        pointsElement.textContent = remainingPoints;
+    }
+
+    // Recalculate HP/MP based on CON/INT changes
+    if (attr === 'con') {
+        maxHP = calculateMaxHP();
+        currentHP = maxHP; // Heal to full when increasing CON
+        updateHPBar();
+    }
+    if (attr === 'int') {
+        maxMP = 50 + (attributes.int * 2); // 2 MP per INT point
+        currentMP = maxMP; // Restore to full when increasing INT
+        updateMPBar();
+    }
+
+    // Check for new traits unlocked
+    checkForNewTraits(attr);
+
+    // Save to localStorage
+    try {
+        const raw = localStorage.getItem('characterData');
+        if (raw) {
+            const c = JSON.parse(raw);
+            c.attributes = attributes;
+            c.remainingPoints = remainingPoints;
+            c.selectedTraits = selectedTraits;
+            localStorage.setItem('characterData', JSON.stringify(c));
+        }
+    } catch (e) {
+        console.warn('Failed to persist attributes:', e);
+    }
+}
+
+// Check if new traits are unlocked based on attribute changes
+function checkForNewTraits(attr) {
+    if (!traitsByAttribute[attr]) return;
+
+    const availableTraits = traitsByAttribute[attr].filter(trait => {
+        // Check if meets minimum stat requirement and not already selected
+        return attributes[attr] >= trait.minStat && 
+               !selectedTraits.find(t => t.name === trait.name);
+    });
+
+    if (availableTraits.length > 0) {
+        showTraitModal(availableTraits, attr);
+    }
+}
+
+// Show trait selection modal
+function showTraitModal(traits, source) {
+    const modal = document.getElementById('traitModal');
+    const traitList = document.getElementById('traitList');
+    if (!modal || !traitList) return;
+
+    traitList.innerHTML = '';
+    
+    traits.forEach(trait => {
+        const card = document.createElement('div');
+        card.className = 'trait-card';
+        card.innerHTML = `
+            <h4>${trait.name}</h4>
+            <p class="trait-requirement">Requires ${source.toUpperCase()} ${trait.minStat}+</p>
+            <p class="trait-description">${trait.description}</p>
+        `;
+        
+        const selectBtn = document.createElement('button');
+        selectBtn.className = 'trait-select-btn';
+        selectBtn.textContent = 'Select This Trait';
+        selectBtn.onclick = () => selectTrait(trait, source);
+        
+        card.appendChild(selectBtn);
+        traitList.appendChild(card);
+    });
+
+    modal.style.display = 'flex';
+}
+
+// Select a trait
+function selectTrait(trait, source) {
+    selectedTraits.push({
+        name: trait.name,
+        description: trait.description,
+        source: source.toUpperCase(),
+        minStat: trait.minStat
+    });
+
+    // Save to localStorage
+    try {
+        const raw = localStorage.getItem('characterData');
+        if (raw) {
+            const c = JSON.parse(raw);
+            c.selectedTraits = selectedTraits;
+            localStorage.setItem('characterData', JSON.stringify(c));
+        }
+    } catch (e) {
+        console.warn('Failed to persist traits:', e);
+    }
+
+    updateTraitsDisplay();
+    closeTraitModal();
+}
+
+// Close trait modal
+function closeTraitModal() {
+    const modal = document.getElementById('traitModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// HP regeneration (called every 5 seconds)
+function regenerateHP() {
+    if (currentHP < maxHP) {
+        // Regenerate 1% of max HP per tick
+        const regenAmount = maxHP * 0.01;
+        currentHP = Math.min(maxHP, currentHP + regenAmount);
+        updateHPBar();
+    }
+}
+
+// MP regeneration (called every 2 seconds)
+function regenerateMP() {
+    if (currentMP < maxMP) {
+        // Regenerate 2% of max MP per tick
+        const regenAmount = maxMP * 0.02;
+        currentMP = Math.min(maxMP, currentMP + regenAmount);
+        updateMPBar();
     }
 }
 

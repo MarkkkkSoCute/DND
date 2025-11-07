@@ -349,7 +349,8 @@ function startBattle() {
             maxMp: Math.max(20, Math.floor(selectedEnemy.maxHp / 2)),
             mp: Math.max(20, Math.floor(selectedEnemy.maxHp / 2)),
             moves: selectedEnemy.moves,
-            sprite: selectedEnemy.sprite
+            sprite: selectedEnemy.sprite,
+            loot: selectedEnemy.loot // Store loot table for later
         }
     };
     
